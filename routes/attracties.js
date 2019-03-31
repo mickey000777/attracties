@@ -1,64 +1,76 @@
 const express = require("express");
-const attracties = require("../attractielijst");
+
+//models importeren
+const Attractie = require("../models/attractie");
 
 const router = express.Router();
+
 //alla attracties tonen
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+    const attracties = await Attractie.find();
+
     return res.send(attracties);
 });
-//een enkele attractie tonen
-router.get("/:id", (req, res) => {
-    const gevondenAttractie = attracties.find(attractie => {
-        return attractie.id === +req.params.id;
-    });
 
-    if (!gevondenAttractie){
-        return res.status(404).send(`Attractie met id ${req.params.id} niet gevonden`);
-    }
-
-    return res.send(gevondenAttractie);
-});
 //een attractie toevoegen
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
     //json data zit in req.body object
     const data = req.body;
-    //zoeken naar het hoogste id
-    const laatsteId = attracties[attracties.length - 1].id;
-    //1 optellen om een uniek id te houden
-    data.id = laatsteId + 1;
-    //voeg nieuwe attractie toe aan de lijst
-    attracties.push(data);
-    //de nieuwe attractie terugsturen naar de aanvrager
-    return res.send(data);
-});
+   
+    try {
+        //een nieuwe attractie aanmaken op basis van het model in geheugen
+        const nieuweAttractie = new Attractie(data);
+        //de attractie opslaan in de databank + de nieuwe attractie
+        //geven met id
+        const toegevoegdeAttractie = await Attractie.create(nieuweAttractie);
 
-router.delete("/:id", (req, res) => {
-    const gevondenAttractieIndex = attracties.findIndex(attractie => {
-        return attractie.id === +req.params.id;
-    });
-    if(gevondenAttractieIndex === -1) {
-        return res.status(404).send(`Attractie met id ${req.params.id} niet gevonden.`);
+        return res.send(toegevoegdeAttractie);
+    } catch(err) {
+        return res.status(400).send(err);
     }
-    attracties.splice(gevondenAttractieIndex, 1);
-    return res.send(`Attractie met id ${req.params.id} is verwijderd`);
 });
 
-router.put("/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
+    const _id = req.params.id;
+
+    try {
+        const resultaat = await Attractie.deleteOne({   //verwijdert één document
+            _id     //is hetzelfde als _id: _id
+        });
+    
+
+    if(!resultaat.deletedCount) {
+
+        return res.send(`Attractie met id ${_id} niet gevonden.`);
+    }
+    
+    return res.send(`Attractie met id ${_id} is verwijderd`);
+
+    } catch(err) {
+        return res.status(400).send(err);
+    }
+});
+
+router.put("/:id", async (req, res) => {
     const data = req.body;
-    const gevondenAttractie = attracties.find(attractie => {
-        return attractie.id === +req.params.id;
-    });
-    if (!gevondenAttractie) {
-        return res.status(404).send(`Attractie met id ${req.params.id} niet gevonden`);
-    }
-    //met indexOf() de gevonden attractie zoeken in de array
-    const attractieIndex = attracties.indexOf(gevondenAttractie);
 
-    //het bestaande object in de array vervangen met het nieuwe object
-    //het nieuwe object bevat de eigenschappen van het bestaande samengevoegd
-    // met de eigenschappen van het doorgestuurde object
-    attracties.splice(attractieIndex, 1, { ...gevondenAttractie, ...data});
-    return res.send(attracties[attractieIndex]);
+    try {
+        const gewijzigdeAttractie = await Attractie.findByIdAndUpdate(
+            req.params.id,
+            data, {
+                runValidators: true,
+                new: true
+            });
+        
+        if(!gewijzigdeAttractie) {
+            return res.status(400).send(`Attractie met id ${req.params.id} niet gevonden`)
+        }
+
+        return res.send(gewijzigdeAttractie);
+        
+    } catch(err) {
+        return res.status(400).send(err);
+    }
 });
 
 module.exports = router;
