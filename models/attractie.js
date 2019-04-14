@@ -1,6 +1,25 @@
 const mongoose = require("mongoose");
 
 const { Schema, model } = mongoose;
+const Verantwoordelijke = require("./verantwoordelijke");
+
+const aantalPersonenSchema = new Schema({
+    individueel: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    perkar: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    perrij: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+});
 
 const attractieSchema = new Schema({
     naam: {
@@ -10,6 +29,10 @@ const attractieSchema = new Schema({
     minimuumlengte: {
         type: Number,
         required: true
+    },
+    verantwoordelijke: {
+        type: Schema.Types.ObjectId,
+        ref: Verantwoordelijke
     },
     categories: {
         // Array van subdocumenten
@@ -21,9 +44,7 @@ const attractieSchema = new Schema({
         }]
     },
     aantalPersonen: {
-        type: Number,
-        required: true,
-        default: 1
+        type: aantalPersonenSchema
     },
     indoorOutdoor: {
         type: String,

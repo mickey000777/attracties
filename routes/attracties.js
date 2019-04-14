@@ -5,7 +5,7 @@ const Attractie = require("../models/attractie");
 
 const router = express.Router();
 
-//alla attracties tonen
+//alle attracties tonen
 router.get("/", async (req, res) => {
     const attracties = await Attractie.find();
 
@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
     try {
         //een nieuwe attractie aanmaken op basis van het model in geheugen
         const nieuweAttractie = new Attractie(data);
-        //de attractie opslaan in de databank + de nieuwe attractie
+        //de attractie opslaan in de databank + de nieuwe attractie terug
         //geven met id
         const toegevoegdeAttractie = await Attractie.create(nieuweAttractie);
 
@@ -29,7 +29,7 @@ router.post("/", async (req, res) => {
         return res.status(400).send(err);
     }
 });
-
+//een attractie verwijderen
 router.delete("/:id", async (req, res) => {
     const _id = req.params.id;
 
@@ -44,13 +44,13 @@ router.delete("/:id", async (req, res) => {
         return res.send(`Attractie met id ${_id} niet gevonden.`);
     }
     
-    return res.send(`Attractie met id ${_id} is verwijderd`);
+        return res.send(`Attractie met id ${_id} is verwijderd`);
 
     } catch(err) {
         return res.status(400).send(err);
     }
 });
-
+//een attractie wijzigen
 router.put("/:id", async (req, res) => {
     const data = req.body;
 
@@ -66,10 +66,10 @@ router.put("/:id", async (req, res) => {
             return res.status(400).send(`Attractie met id ${req.params.id} niet gevonden`)
         }
 
-        return res.send(gewijzigdeAttractie);
+            return res.send(gewijzigdeAttractie);
         
     } catch(err) {
-        return res.status(400).send(err);
+            return res.status(400).send(err);
     }
 });
 
