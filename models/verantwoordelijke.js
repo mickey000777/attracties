@@ -10,6 +10,7 @@ const adresSchema = new Schema({
     huisnummer: {
         type: Number,
         required: true
+    
     },
     postcode: {
         type: String,
