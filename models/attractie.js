@@ -6,8 +6,7 @@ const Verantwoordelijke = require("./verantwoordelijke");
 const aantalPersonenSchema = new Schema({
     individueel: {
         type: Number,
-        required: true,
-        default: 0
+        required: true
     },
     perkar: {
         type: Number,
